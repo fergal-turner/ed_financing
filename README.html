@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.31">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>readme</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="README_files/libs/clipboard/clipboard.min.js"></script>
+<script src="README_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="README_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="README_files/libs/quarto-html/popper.min.js"></script>
+<script src="README_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="README_files/libs/quarto-html/anchor.min.js"></script>
+<link href="README_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="README_files/libs/quarto-html/quarto-syntax-highlighting-7c69b197886ae2a34062761d21e44731.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="README_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="README_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="README_files/libs/bootstrap/bootstrap-efbb37e9afcc02144ebbc7afd12a776f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+
+<section id="education-financing-indicator-inventory-and-definitions" class="level1">
+<h1>Education Financing: Indicator Inventory and Definitions</h1>
+<p>This README documents exactly which indicators are pulled in the data preparation notebooks, where they come from, and how they are defined.</p>
+<section id="analysis-summary-from-notebook-01-first-two-headings" class="level2">
+<h2 class="anchored" data-anchor-id="analysis-summary-from-notebook-01-first-two-headings">Analysis Summary From Notebook 01 (First Two Headings)</h2>
+<p>This section summarizes the content under the first two headings in <code>Code/Data Analysis/01. Spending, Income &amp; LAYS.ipynb</code>:</p>
+<ul>
+<li>Does GDPPC Correlate with LAYS?</li>
+<li>What is the relationship between GDPPC and LAYS?</li>
+</ul>
+<p>It excludes the “Other Drivers of Learning” section.</p>
+<section id="methodology" class="level3">
+<h3 class="anchored" data-anchor-id="methodology">Methodology</h3>
+<ol type="1">
+<li>Build analysis sample:</li>
+</ol>
+<ul>
+<li>Start from <code>all_data</code>.</li>
+<li>Keep observations with non-missing <code>lays</code> and <code>gdppc_2015_usd</code>.</li>
+<li>Drop countries labeled “Not classified” in income group.</li>
+<li>Retain core columns (<code>iso3</code>, <code>year</code>, <code>income_group</code>, <code>lays</code>, <code>gdppc_2015_usd</code>).</li>
+<li>Collapse to one row per country (<code>groupby("iso3").first()</code>) for cross-country analysis.</li>
+</ul>
+<ol start="2" type="1">
+<li>Visual diagnostics:</li>
+</ol>
+<ul>
+<li>Plot LAYS against GDP per capita in levels and with a log-scaled x-axis.</li>
+<li>Color points by income group to inspect heterogeneity.</li>
+</ul>
+<ol start="3" type="1">
+<li>Functional-form tests for GDPPC-LAYS relationship:</li>
+</ol>
+<ul>
+<li>Linear OLS model using standardized GDP per capita (<code>gdppc_s</code>).</li>
+<li>Log-linear OLS model using <code>log_gdppc</code>.</li>
+<li>Quartic OLS model using polynomial terms (<code>gdppc_s</code>, <code>gdppc2</code>, <code>gdppc3</code>, <code>gdppc4</code>).</li>
+<li>Predict fitted values on a common grid and compare curve shapes and model fit.</li>
+</ul>
+<ol start="4" type="1">
+<li>Income-group slope heterogeneity:</li>
+</ol>
+<ul>
+<li>Estimate an interaction model (log GDPPC with income-group dummies and interactions).</li>
+<li>Estimate separate log-GDPPC regressions by income group (LIC, LMIC, UMIC, HIC).</li>
+<li>Compare sign and magnitude of coefficients and visualize group-specific trend lines.</li>
+</ul>
+</section>
+<section id="key-findings" class="level3">
+<h3 class="anchored" data-anchor-id="key-findings">Key Findings</h3>
+<ol type="1">
+<li>GDP per capita and learning outcomes are positively related overall, but the association is nonlinear.</li>
+<li>The log-GDPPC specification provides the best fit among tested forms and is consistent with diminishing returns: gains in LAYS are steeper at lower income levels and flatter at higher income levels.</li>
+<li>The quartic model captures additional curvature and turning points, but does not outperform the log model in explanatory power in this notebook.</li>
+<li>The relationship differs by income group:</li>
+</ol>
+<ul>
+<li>For low-income countries, the within-group slope is weakly negative and not statistically distinguishable from zero in the notebook write-up.</li>
+<li>For lower-middle- and upper-middle-income countries, the slope is positive and stronger.</li>
+<li>High-income countries continue to show positive association but with flatter marginal gains than poorer groups.</li>
+</ul>
+<ol start="5" type="1">
+<li>Visual diagnostics suggest clusters of positive outliers among LMICs and UMICs (better-than-predicted LAYS) and weaker-than-predicted performance among some LICs; the notebook notes these as visual patterns that were not fully validated in additional diagnostics.</li>
+</ol>
+</section>
+<section id="interpretation" class="level3">
+<h3 class="anchored" data-anchor-id="interpretation">Interpretation</h3>
+<p>The first two sections support a threshold-style interpretation: income growth is strongly associated with improved learning outcomes at lower income levels, but additional income alone becomes less predictive as countries grow richer. This motivates the later analysis on additional drivers while preserving GDPPC as a central baseline control.</p>
+</section>
+</section>
+<section id="quick-variable-dictionary" class="level2">
+<h2 class="anchored" data-anchor-id="quick-variable-dictionary">Quick Variable Dictionary</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Working variable</th>
+<th>Source</th>
+<th>Indicator ID / construction</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Outcome</td>
+<td><code>lays</code></td>
+<td>Our World in Data (HCI/LAYS series)</td>
+<td>Mean of <code>hd_hci_lays_ma</code> and <code>hd_hci_lays_fe</code></td>
+</tr>
+<tr class="even">
+<td>Outcome</td>
+<td><code>lays_male</code></td>
+<td>Our World in Data (HCI/LAYS series)</td>
+<td><code>hd_hci_lays_ma</code></td>
+</tr>
+<tr class="odd">
+<td>Outcome</td>
+<td><code>lays_female</code></td>
+<td>Our World in Data (HCI/LAYS series)</td>
+<td><code>hd_hci_lays_fe</code></td>
+</tr>
+<tr class="even">
+<td>Outcome</td>
+<td><code>pcr_pct</code></td>
+<td>UNESCO UIS API</td>
+<td><code>CR.1</code></td>
+</tr>
+<tr class="odd">
+<td>Outcome</td>
+<td><code>pcr_modelled_pct</code></td>
+<td>UNESCO UIS API</td>
+<td><code>CR.MOD.1</code></td>
+</tr>
+<tr class="even">
+<td>Outcome</td>
+<td><code>pcr_wpia</code></td>
+<td>UNESCO UIS API</td>
+<td><code>CR.1.WPIA</code></td>
+</tr>
+<tr class="odd">
+<td>Predictor</td>
+<td><code>expenditure_pctbudget_imf</code></td>
+<td>UNESCO UIS API</td>
+<td><code>XGOVEXP.IMFCALC</code></td>
+</tr>
+<tr class="even">
+<td>Predictor</td>
+<td><code>expenditure_pctbudget_uis</code></td>
+<td>UNESCO UIS API</td>
+<td><code>XGOVEXP.IMF</code></td>
+</tr>
+<tr class="odd">
+<td>Predictor</td>
+<td><code>expenditure_pctgdp</code></td>
+<td>UNESCO UIS API</td>
+<td><code>XGDP.FSGOV</code></td>
+</tr>
+<tr class="even">
+<td>Predictor</td>
+<td><code>capex_pcttotal</code></td>
+<td>UNESCO UIS API</td>
+<td><code>XSPENDP.FDPUB.FNCAP</code></td>
+</tr>
+<tr class="odd">
+<td>Predictor</td>
+<td><code>currex_pcttotal</code></td>
+<td>UNESCO UIS API</td>
+<td><code>XSPENDP.FDPUB.FNCUR</code></td>
+</tr>
+<tr class="even">
+<td>Predictor</td>
+<td><code>all_staff_pcttotal</code></td>
+<td>UNESCO UIS API</td>
+<td><code>XSPENDP.FDPUB.FNS</code></td>
+</tr>
+<tr class="odd">
+<td>Predictor</td>
+<td><code>teaching_staff_pcttotal</code></td>
+<td>UNESCO UIS API</td>
+<td><code>XSPENDP.FDPUB.FNTS</code></td>
+</tr>
+<tr class="even">
+<td>Predictor</td>
+<td>COFOG sector shares</td>
+<td>IMF SDMX API (<code>IMF.STA,GFS_COFOG</code>)</td>
+<td><code>GF01_T</code> to <code>GF10_T</code>, transformation <code>POTO_PT</code></td>
+</tr>
+<tr class="odd">
+<td>Predictor</td>
+<td>COFOG education sub-shares</td>
+<td>IMF SDMX API (<code>IMF.STA,GFS_COFOG</code>)</td>
+<td><code>GF09*</code> family normalized by <code>GF09_T</code></td>
+</tr>
+<tr class="even">
+<td>Control</td>
+<td><code>sap</code></td>
+<td>UNESCO UIS API</td>
+<td><code>SAP.1</code></td>
+</tr>
+<tr class="odd">
+<td>Control</td>
+<td><code>pop_total</code></td>
+<td>World Bank WDI</td>
+<td><code>SP.POP.TOTL</code></td>
+</tr>
+<tr class="even">
+<td>Control</td>
+<td><code>sap_share</code></td>
+<td>Derived (UIS + WDI)</td>
+<td><code>sap / pop_total</code></td>
+</tr>
+<tr class="odd">
+<td>Control</td>
+<td><code>gdppc_2015_usd</code></td>
+<td>World Bank WDI</td>
+<td><code>NY.GDP.PCAP.KD</code></td>
+</tr>
+<tr class="even">
+<td>Control</td>
+<td><code>gdp_growth_pct</code></td>
+<td>World Bank WDI</td>
+<td><code>NY.GDP.MKTP.KD.ZG</code></td>
+</tr>
+<tr class="odd">
+<td>Control</td>
+<td><code>inflation_pct</code></td>
+<td>World Bank WDI</td>
+<td><code>FP.CPI.TOTL.ZG</code></td>
+</tr>
+<tr class="even">
+<td>Control</td>
+<td><code>debt_pct_gdp</code></td>
+<td>World Bank WDI</td>
+<td><code>GC.DOD.TOTL.GD.ZS</code></td>
+</tr>
+<tr class="odd">
+<td>Control</td>
+<td>FSI score/rank and pillars</td>
+<td>Fragile States Index (Fund for Peace)</td>
+<td><code>Total</code>, <code>Rank</code>, <code>C1-C3</code>, <code>E1-E3</code>, <code>P1-P3</code>, <code>S1-S2</code>, <code>X1</code>, <code>Change from Previous Year</code></td>
+</tr>
+<tr class="even">
+<td>Control</td>
+<td>private primary enrollment share</td>
+<td>UNESCO UIS API</td>
+<td><code>ETOIP.1.PR</code></td>
+</tr>
+<tr class="odd">
+<td>Control</td>
+<td>household private education spending (% GDP)</td>
+<td>UNESCO UIS API</td>
+<td><code>XGDP.FSHH.FFNTR</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="sources-used" class="level2">
+<h2 class="anchored" data-anchor-id="sources-used">Sources used</h2>
+<ul>
+<li>UNESCO UIS API (via <code>api_helpers.uis_api</code>)</li>
+<li>World Bank API, Source 2: World Development Indicators (via <code>api_helpers.world_bank_api</code>)</li>
+<li>IMF SDMX API, flow <code>IMF.STA,GFS_COFOG</code> (via <code>api_helpers.imf_api</code>)</li>
+<li>Fragile States Index (Fund for Peace), annual Excel files in <code>Data/FSI Raw Data/</code></li>
+<li>Our World in Data grapher extract for Human Capital Index LAYS series</li>
+</ul>
+</section>
+<section id="outcomes" class="level2">
+<h2 class="anchored" data-anchor-id="outcomes">1) Outcomes</h2>
+<section id="outcome-a-learning-adjusted-years-of-schooling-lays" class="level3">
+<h3 class="anchored" data-anchor-id="outcome-a-learning-adjusted-years-of-schooling-lays">Outcome A: Learning-Adjusted Years of Schooling (LAYS)</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Working variable</th>
+<th>Pulled field(s)</th>
+<th>Source</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>lays</code></td>
+<td>Derived from <code>hd_hci_lays_ma</code> and <code>hd_hci_lays_fe</code></td>
+<td>Our World in Data grapher CSV: <code>learning-adjusted-years-of-schooling-gender-scatter</code></td>
+<td>Learning-adjusted years of schooling combines quantity of schooling with learning quality. In this project, <code>lays</code> is calculated as the mean of male and female LAYS.</td>
+</tr>
+<tr class="even">
+<td><code>lays_male</code></td>
+<td><code>hd_hci_lays_ma</code></td>
+<td>Our World in Data (HCI series)</td>
+<td>Male learning-adjusted years of schooling.</td>
+</tr>
+<tr class="odd">
+<td><code>lays_female</code></td>
+<td><code>hd_hci_lays_fe</code></td>
+<td>Our World in Data (HCI series)</td>
+<td>Female learning-adjusted years of schooling.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="outcome-b-primary-completion-rate-pcr" class="level3">
+<h3 class="anchored" data-anchor-id="outcome-b-primary-completion-rate-pcr">Outcome B: Primary Completion Rate (PCR)</h3>
+<p>Pulled in <code>Code/Data Preparation/02. Y - Outcomes.ipynb</code> and stored in <code>Data/pcr.csv</code>.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Working variable</th>
+<th>Indicator ID</th>
+<th>Source</th>
+<th>Definition (source metadata)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>pcr_pct</code></td>
+<td><code>CR.1</code></td>
+<td>UNESCO UIS API</td>
+<td>Completion rate, primary education, both sexes (%).</td>
+</tr>
+<tr class="even">
+<td><code>pcr_modelled_pct</code></td>
+<td><code>CR.MOD.1</code></td>
+<td>UNESCO UIS API</td>
+<td>Completion rate, primary education, both sexes (modelled data) (%).</td>
+</tr>
+<tr class="odd">
+<td><code>pcr_wpia</code></td>
+<td><code>CR.1.WPIA</code></td>
+<td>UNESCO UIS API</td>
+<td>Completion rate, primary education, adjusted wealth parity index (WPIA).</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="predictors" class="level2">
+<h2 class="anchored" data-anchor-id="predictors">2) Predictors</h2>
+<section id="predictor-block-a-government-expenditure-by-function-cofog" class="level3">
+<h3 class="anchored" data-anchor-id="predictor-block-a-government-expenditure-by-function-cofog">Predictor block A: Government expenditure by function (COFOG)</h3>
+<p>Pulled in <code>Code/Data Preparation/01. X - Predictors.ipynb</code> using:</p>
+<ul>
+<li><code>imf_get_gfs_cofog(transformations="POTO_PT", frequency="A", start_year=2000, end_year=2026)</code></li>
+</ul>
+<p>Definition of transformation:</p>
+<ul>
+<li><code>POTO_PT</code>: percent of total outlays (share of total government expenditure).</li>
+</ul>
+<section id="a1.-aggregate-cofog-sectors-saved-to-datacofog_all.csv" class="level4">
+<h4 class="anchored" data-anchor-id="a1.-aggregate-cofog-sectors-saved-to-datacofog_all.csv">A1. Aggregate COFOG sectors (saved to <code>Data/cofog_all.csv</code>)</h4>
+<p>Indicators are the COFOG aggregate <code>GF01_T</code> to <code>GF10_T</code>, renamed to labels in the output table:</p>
+<ul>
+<li>General public services, Transactions</li>
+<li>Defence, Transactions</li>
+<li>Public order and safety, Transactions</li>
+<li>Economic affairs, Transactions</li>
+<li>Environmental protection, Transactions</li>
+<li>Housing and community amenities, Transactions</li>
+<li>Health, Transactions</li>
+<li>Recreation, culture and religion, Transactions</li>
+<li>Education, Transactions</li>
+<li>Social protection, Transactions</li>
+</ul>
+<p>Definition: each column is the share of total outlays allocated to that COFOG function (from IMF GFS COFOG data, transformation <code>POTO_PT</code>), converted from percent to proportion in the notebook.</p>
+</section>
+<section id="a2.-education-cofog-family-saved-to-datacofog_edu.csv" class="level4">
+<h4 class="anchored" data-anchor-id="a2.-education-cofog-family-saved-to-datacofog_edu.csv">A2. Education COFOG family (saved to <code>Data/cofog_edu.csv</code>)</h4>
+<p>Indicators are from the <code>GF09</code> family (<code>^GF09\d*_T$</code>) and output under label names:</p>
+<ul>
+<li>Education, Transactions (total education function)</li>
+<li>Pre-primary and primary education, Transactions</li>
+<li>Secondary education, Transactions</li>
+<li>Post-secondary non-tertiary education, Transactions</li>
+<li>Tertiary education, Transactions</li>
+<li>Education not definable by level, Transactions</li>
+<li>Education n.e.c., Transactions</li>
+<li>Subsidiary services to education, Transactions</li>
+<li>R&amp;D Education, Transactions</li>
+</ul>
+<p>Definition: each education sub-function is normalized by the education total (<code>GF09_T</code>) in the notebook, so these are shares of education spending by sub-function.</p>
+</section>
+</section>
+<section id="predictor-block-b-recurrent-vs-capital-education-expenditure-uis" class="level3">
+<h3 class="anchored" data-anchor-id="predictor-block-b-recurrent-vs-capital-education-expenditure-uis">Predictor block B: Recurrent vs capital education expenditure (UIS)</h3>
+<p>Pulled in <code>Code/Data Preparation/01. X - Predictors.ipynb</code> and saved to:</p>
+<ul>
+<li><code>Data/expenditure_long.csv</code></li>
+<li><code>Data/expenditure_wide.csv</code></li>
+</ul>
+<p>All pulled as percentages, then divided by 100 in the notebook to store proportions.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Working variable</th>
+<th>Indicator ID</th>
+<th>Source</th>
+<th>Definition (source metadata)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>expenditure_pctbudget_imf</code></td>
+<td><code>XGOVEXP.IMFCALC</code></td>
+<td>UNESCO UIS API</td>
+<td>Expenditure on education as a percentage of total government expenditure (%) (IMF calculation).</td>
+</tr>
+<tr class="even">
+<td><code>expenditure_pctbudget_uis</code></td>
+<td><code>XGOVEXP.IMF</code></td>
+<td>UNESCO UIS API</td>
+<td>Expenditure on education as a percentage of total government expenditure (%) (UIS calculation).</td>
+</tr>
+<tr class="odd">
+<td><code>expenditure_pctgdp</code></td>
+<td><code>XGDP.FSGOV</code></td>
+<td>UNESCO UIS API</td>
+<td>Government expenditure on education as a percentage of GDP (%).</td>
+</tr>
+<tr class="even">
+<td><code>capex_pcttotal</code></td>
+<td><code>XSPENDP.FDPUB.FNCAP</code></td>
+<td>UNESCO UIS API</td>
+<td>Capital expenditure as a percentage of total expenditure in public institutions (%).</td>
+</tr>
+<tr class="odd">
+<td><code>currex_pcttotal</code></td>
+<td><code>XSPENDP.FDPUB.FNCUR</code></td>
+<td>UNESCO UIS API</td>
+<td>Current expenditure as a percentage of total expenditure in public institutions (%).</td>
+</tr>
+<tr class="even">
+<td><code>all_staff_pcttotal</code></td>
+<td><code>XSPENDP.FDPUB.FNS</code></td>
+<td>UNESCO UIS API</td>
+<td>All staff compensation as a percentage of total expenditure in public institutions (%).</td>
+</tr>
+<tr class="odd">
+<td><code>teaching_staff_pcttotal</code></td>
+<td><code>XSPENDP.FDPUB.FNTS</code></td>
+<td>UNESCO UIS API</td>
+<td>Teaching staff compensation as a percentage of total expenditure in public institutions (%).</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="controls" class="level2">
+<h2 class="anchored" data-anchor-id="controls">3) Controls</h2>
+<section id="control-block-a-education-system-controls-uis-wb" class="level3">
+<h3 class="anchored" data-anchor-id="control-block-a-education-system-controls-uis-wb">Control block A: Education system controls (UIS + WB)</h3>
+<p>Pulled in <code>Code/Data Preparation/03. X - Controls.ipynb</code>.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Working variable</th>
+<th>Indicator ID / construction</th>
+<th>Source</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>sap</code></td>
+<td><code>SAP.1</code></td>
+<td>UNESCO UIS API</td>
+<td>School age population, primary education, both sexes (number).</td>
+</tr>
+<tr class="even">
+<td><code>pop_total</code></td>
+<td><code>SP.POP.TOTL</code></td>
+<td>World Bank WDI</td>
+<td>Total population (midyear estimate; de facto resident population).</td>
+</tr>
+<tr class="odd">
+<td><code>sap_share</code></td>
+<td><code>sap / pop_total</code></td>
+<td>Derived from UIS + WDI</td>
+<td>Share of population that is of primary-school age.</td>
+</tr>
+</tbody>
+</table>
+<p>Related pull also in the controls notebook (education system/private financing context):</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Pulled variable (long format)</th>
+<th>Indicator ID</th>
+<th>Source</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>private primary enrollment share</td>
+<td><code>ETOIP.1.PR</code></td>
+<td>UNESCO UIS API</td>
+<td>Percentage of enrolment in primary education in private institutions, both sexes (%).</td>
+</tr>
+<tr class="even">
+<td>private household education spending vs GDP</td>
+<td><code>XGDP.FSHH.FFNTR</code></td>
+<td>UNESCO UIS API</td>
+<td>Initial private expenditure on education (household) as a percentage of GDP (%).</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="control-block-b-state-fragility-fsi" class="level3">
+<h3 class="anchored" data-anchor-id="control-block-b-state-fragility-fsi">Control block B: State fragility (FSI)</h3>
+<p>Pulled from annual FSI files <code>fsi-YYYY.xlsx</code> (2011-2023) and saved to <code>Data/fsi.csv</code>.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable(s) in file</th>
+<th>Source</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Rank</code>, <code>Total</code></td>
+<td>Fragile States Index (Fund for Peace, CAST framework)</td>
+<td>Composite fragility rank and total score for each country-year.</td>
+</tr>
+<tr class="even">
+<td><code>C1</code> to <code>C3</code>, <code>E1</code> to <code>E3</code>, <code>P1</code> to <code>P3</code>, <code>S1</code> to <code>S2</code>, <code>X1</code> columns</td>
+<td>Fragile States Index</td>
+<td>The 12 CAST indicators: Security Apparatus, Factionalized Elites, Group Grievance, Economy/Economic Decline, Economic Inequality/Uneven Development, Human Flight and Brain Drain, State Legitimacy, Public Services, Human Rights and Rule of Law, Demographic Pressures, Refugees and IDPs, External Intervention.</td>
+</tr>
+<tr class="odd">
+<td><code>Change from Previous Year</code></td>
+<td>Fragile States Index</td>
+<td>Year-over-year change in total fragility score.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="control-block-c-macro-controls-world-bank" class="level3">
+<h3 class="anchored" data-anchor-id="control-block-c-macro-controls-world-bank">Control block C: Macro controls (World Bank)</h3>
+<p>Pulled in <code>Code/Data Preparation/03. X - Controls.ipynb</code> via <code>wb_get(..., source=2)</code> with indicators below.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Working variable</th>
+<th>Indicator ID</th>
+<th>Source</th>
+<th>Definition (WDI metadata)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>gdppc_2015_usd</code></td>
+<td><code>NY.GDP.PCAP.KD</code></td>
+<td>World Bank WDI</td>
+<td>GDP per capita (constant 2015 US$).</td>
+</tr>
+<tr class="even">
+<td><code>gdp_growth_pct</code></td>
+<td><code>NY.GDP.MKTP.KD.ZG</code></td>
+<td>World Bank WDI</td>
+<td>GDP growth (annual %).</td>
+</tr>
+<tr class="odd">
+<td><code>inflation_pct</code></td>
+<td><code>FP.CPI.TOTL.ZG</code></td>
+<td>World Bank WDI</td>
+<td>Inflation, consumer prices (annual %), based on CPI annual percentage change.</td>
+</tr>
+<tr class="even">
+<td><code>debt_pct_gdp</code></td>
+<td><code>GC.DOD.TOTL.GD.ZS</code></td>
+<td>World Bank WDI</td>
+<td>Central government debt, total (% of GDP).</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="notes-on-units-and-transformations" class="level2">
+<h2 class="anchored" data-anchor-id="notes-on-units-and-transformations">Notes on units and transformations</h2>
+<ul>
+<li><code>expenditure_*</code>, <code>capex_pcttotal</code>, <code>currex_pcttotal</code>, <code>all_staff_pcttotal</code>, and <code>teaching_staff_pcttotal</code> are stored as proportions in this project (<code>percent / 100</code>).</li>
+<li><code>cofog_all.csv</code> also stores sector shares as proportions (<code>percent / 100</code>).</li>
+<li><code>cofog_edu.csv</code> is normalized to education total (<code>GF09_T</code>), so sub-sector values represent within-education shares.</li>
+</ul>
+</section>
+<section id="dataset-outputs-and-recent-updates" class="level2">
+<h2 class="anchored" data-anchor-id="dataset-outputs-and-recent-updates">Dataset Outputs and Recent Updates</h2>
+<p>The data preparation notebooks currently write the following core files to <code>Data/</code>:</p>
+<ul>
+<li><code>iso3.csv</code>: country lookup (<code>iso3</code>, <code>country_name</code>) plus <code>wb_income_group</code> pulled from World Bank country metadata.</li>
+<li><code>lays.csv</code>: outcome file with <code>lays</code>, <code>lays_male</code>, <code>lays_female</code> by <code>iso3</code> and <code>year</code>.</li>
+<li><code>pcr.csv</code>: primary completion outcomes from UIS API.</li>
+<li><code>cofog_all.csv</code>: aggregate COFOG shares as proportions.</li>
+<li><code>cofog_edu.csv</code>: COFOG education sub-function shares normalized by total education spending.</li>
+<li><code>expenditure.csv</code> (plus <code>expenditure_long.csv</code>, <code>expenditure_wide.csv</code>): UIS expenditure indicators, stored as proportions.</li>
+<li><code>uis_controls.csv</code>: SAP, total population, SAP share, and private financing controls.</li>
+<li><code>fsi.csv</code>: Fragile States Index panel with harmonized country IDs and snake_case column labels.</li>
+<li><code>fsi_summary.csv</code>: reduced FSI file with <code>iso3</code>, <code>year</code>, and <code>fsi_total</code>.</li>
+<li><code>macro.csv</code>: World Bank macro controls (<code>gdppc_2015_usd</code>, <code>gdp_growth_pct</code>, <code>inflation_pct</code>, <code>debt_pct_gdp</code>) plus <code>income_group</code> mapped from <code>iso3.csv</code>.</li>
+<li><code>all_data.csv</code>: merged country-year analysis dataset from outcomes, predictors, and controls.</li>
+<li><code>lays_panels.csv</code>: stacked LAYS interval panels (<code>panel</code> id 1-5) used for long-difference analysis.</li>
+</ul>
+</section>
+<section id="how-lays_panels-was-constructed" class="level2">
+<h2 class="anchored" data-anchor-id="how-lays_panels-was-constructed">How <code>lays_panels</code> Was Constructed</h2>
+<p>Construction is defined in <code>Code/Data Preparation/00. Combined Dataset.ipynb</code>.</p>
+<section id="step-1-build-base-lays-sample" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-build-base-lays-sample">Step 1: Build base LAYS sample</h3>
+<ul>
+<li>Start from <code>all_data</code> and retain rows with non-missing <code>lays</code>.</li>
+</ul>
+</section>
+<section id="step-2-build-five-two-year-panels" class="level3">
+<h3 class="anchored" data-anchor-id="step-2-build-five-two-year-panels">Step 2: Build five two-year panels</h3>
+<p>Each panel keeps only countries with observations in both years of that interval:</p>
+<ul>
+<li><code>panel1</code>: 2010 to 2017</li>
+<li><code>panel2</code>: 2010 to 2018</li>
+<li><code>panel3</code>: 2010 to 2020</li>
+<li><code>panel4</code>: 2017 to 2020</li>
+<li><code>panel5</code>: 2018 to 2020</li>
+</ul>
+<p>For each panel, data are sorted by <code>iso3, year</code>, duplicate <code>iso3-year</code> rows are removed, and countries are retained only when <code>nunique(year) == 2</code> within the interval.</p>
+</section>
+<section id="step-3-build-panel-level-change-datasets" class="level3">
+<h3 class="anchored" data-anchor-id="step-3-build-panel-level-change-datasets">Step 3: Build panel-level change datasets</h3>
+<p>Using <code>build_panel_change_dataset(...)</code>, each panel also has a transformed country-level dataset:</p>
+<ul>
+<li><code>baseline_&lt;var&gt;</code>: value at interval start year.</li>
+<li><code>delta_&lt;var&gt;</code>: annualized change from start to end year.</li>
+</ul>
+<p>Annualization denominators:</p>
+<ul>
+<li>panel1: <code>/ 7</code></li>
+<li>panel2: <code>/ 8</code></li>
+<li>panel3: <code>/ 10</code></li>
+<li>panel4: <code>/ 3</code></li>
+<li>panel5: <code>/ 2</code></li>
+</ul>
+<p>In this transformation, key columns are excluded from delta/baseline expansion (<code>iso3</code>, <code>year</code>, <code>income_group</code>).</p>
+</section>
+<section id="step-4-stack-panels" class="level3">
+<h3 class="anchored" data-anchor-id="step-4-stack-panels">Step 4: Stack panels</h3>
+<ul>
+<li>Add panel IDs (<code>'1'</code> to <code>'5'</code>) to each interval panel.</li>
+<li>Concatenate to <code>all_panels</code>.</li>
+<li>Export as <code>Data/lays_panels.csv</code>.</li>
+</ul>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

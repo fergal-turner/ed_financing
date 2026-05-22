@@ -1,0 +1,9 @@
+Model,r2,Income Group,Predictor,Coefficient,P-value,N
+model_5a_1,0.075,Low Income,Log GDPPC,-1.492,0.727,13
+model_5a_2,0.687,Low Income,Log Expenditure per Child,0.232,0.171,13
+model_5b_1,0.242,Lower Middle Income,Log GDPPC,8.904,0.262,23
+model_5b_2,0.908,Lower Middle Income,Log Expenditure per Child,4.352,0.001,23
+model_5c_1,0.128,Upper Middle Income,Log GDPPC,1.759,0.0,140
+model_5c_2,0.144,Upper Middle Income,Log Expenditure per Child,0.716,0.017,64
+model_5d_1,0.001,High Income,Log GDPPC,0.078,0.743,210
+model_5d_2,0.0,High Income,Log Expenditure per Child,0.028,0.9,141
