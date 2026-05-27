@@ -1,4 +1,4 @@
-# Education Financing: Analaysis of domestic financing and Learning Adjusted Years of Schooling
+# Analysis of domestic financing and Learning Adjusted Years of Schooling
 
 This repository captures analysis of publicly available domestic financing data and data on Learning Adjusted Years of Schooling. The purpose of the analysis it to explore the extent to which spending on education drives better outcomes for children. Specifically we want to understand:
 1. Is learning predicted by national wealth (notebook 01)?
